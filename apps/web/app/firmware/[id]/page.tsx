@@ -163,6 +163,15 @@ export default function FirmwareDetailsPage() {
               </ul>
             </div>
           )}
+
+          {workspace && workspace.status === 'failed' && workspace.error && (
+            <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-xs">
+              <div className="mb-1 font-semibold text-red-300">Extraction failed</div>
+              <pre className="whitespace-pre-wrap break-words font-mono text-red-200/90">
+                {workspace.error}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
     </div>

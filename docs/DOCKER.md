@@ -10,7 +10,7 @@ The provided files:
 | File | Purpose |
 | --- | --- |
 | `Dockerfile` | One image with Node + firmware tools; runs API or web |
-| `docker-compose.yml` | Two services: `api` (:4000) and `web` (:3000) + a storage volume |
+| `docker-compose.yml` | Two services: `api` (host :4001) and `web` (host :3003) + a storage volume |
 | `docker/entrypoint-api.sh` | Prepares storage, applies DB schema, seeds once, starts API |
 | `.env.docker.example` | Compose config (the browser-facing API URL) |
 
@@ -46,9 +46,13 @@ nano .env
 
 Set `PUBLIC_API_URL`:
 
-- Testing on the server itself: `http://localhost:4000`
-- Accessing from other machines on the LAN: `http://<server-ip>:4000`
-  (e.g. `http://192.168.1.50:4000`)
+- Testing on the server itself: `http://localhost:4001`
+- Accessing from other machines on the LAN: `http://<server-ip>:4001`
+  (e.g. `http://192.168.1.50:4001`)
+
+Published host ports default to **3003** (web) and **4001** (API); change them
+with `WEB_PORT` / `API_PORT_HOST` in `.env` if needed. The containers still
+listen internally on 3000/4000.
 
 ## 3. Build and start
 
@@ -63,8 +67,8 @@ seeds the default NDTECH profiles + a demo firmware (only once).
 
 ## 4. Open it
 
-- Web UI:  `http://<server-ip>:3000`
-- API health check:  `http://<server-ip>:4000/health`
+- Web UI:  `http://<server-ip>:3003`
+- API health check:  `http://<server-ip>:4001/health`
 
 Go to **Settings** — all tools should show `✓` (native) and "Live analysis
 possible: Yes". Upload a real firmware and the Preview now shows its **actual**

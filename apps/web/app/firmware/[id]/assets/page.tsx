@@ -41,6 +41,15 @@ export default function AssetBrowserPage() {
         <EmptyState message="No workspace yet. Go to Details and extract the firmware first." />
       )}
 
+      {workspace && workspace.status === 'failed' && (
+        <div className="card mb-4 border-red-500/40 bg-red-500/10 text-sm text-red-200">
+          <div className="mb-1 font-semibold">Extraction failed</div>
+          <pre className="whitespace-pre-wrap break-words font-mono text-xs text-red-200/90">
+            {workspace.error ?? 'Unknown error.'}
+          </pre>
+        </div>
+      )}
+
       {workspace && assets && (
         <>
           <div className="mb-4 flex items-center gap-2 text-xs text-slate-400">
@@ -50,7 +59,7 @@ export default function AssetBrowserPage() {
           </div>
 
           {assets.length === 0 ? (
-            <EmptyState message="No brandable assets detected in this workspace." />
+            <EmptyState message="No brandable web assets (HTML/CSS/JS/images) were found in the extracted files. The firmware extracted, but its web UI may live in a filesystem that wasn't unpacked (e.g. a SquashFS needing sasquatch). See docs/TROUBLESHOOTING.md." />
           ) : (
             <div className="card overflow-x-auto">
               <table className="w-full text-sm">

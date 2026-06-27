@@ -4,11 +4,14 @@
 #   1. cp .env.docker.example .env            # set PUBLIC_API_URL to your server
 #   2. docker compose build
 #   3. docker compose up -d
-#   4. open http://<server>:3000   (API on :4000)
+#   4. open http://<server>:3003   (API on :4001)
 #
 # Both services share one image (built by the `api` service). The `web` service
 # reuses that image, so NEXT_PUBLIC_API_URL is baked at build time from
 # PUBLIC_API_URL below — it must be the address the BROWSER uses to reach the API.
+#
+# Published host ports default to 3003 (web) and 4001 (API); the containers
+# still listen internally on 3000/4000. Override with WEB_PORT / API_PORT_HOST.
 
 services:
   api:
@@ -16,7 +19,8 @@ services:
       context: .
       args:
         # Browser-facing API URL, baked into the web bundle at build time.
-        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:4000}
+        # Must match the PUBLISHED api host port (default 4001).
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:4001}
     image: ndtech-ont:latest
     command: ["sh", "docker/entrypoint-api.sh"]
     environment:
@@ -31,7 +35,8 @@ services:
       # Live tools are present in the image, so never force mock mode here.
       FORCE_MOCK_MODE: "false"
     ports:
-      - "4000:4000"
+      # host (published) : container (internal). Browser uses the host port.
+      - "${API_PORT_HOST:-4001}:4000"
     volumes:
       - ndtech-storage:/app/storage
     healthcheck:
@@ -50,7 +55,7 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-3003}:3000"
     restart: unless-stopped
 
 volumes:

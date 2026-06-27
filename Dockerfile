@@ -25,9 +25,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       p7zip-full \
       gzip \
       xz-utils \
+      lzop \
+      lz4 \
+      zstd \
+      unzip \
+      cpio \
+      mtd-utils \
       ca-certificates \
       openssl \
+      git \
  && rm -rf /var/lib/apt/lists/*
+
+# Extra firmware extractors that binwalk shells out to. These cover the formats
+# Huawei/realtek ONT images commonly use:
+#   - sasquatch  : non-standard (LZMA) SquashFS  <-- the usual fix
+#   - jefferson  : JFFS2
+#   - ubi_reader : UBIFS
+# Best-effort: wrapped so a failure here never breaks the image build. If a
+# given firmware still won't extract, install exactly what's missing (see
+# docs/TROUBLESHOOTING.md).
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      build-essential python3 python3-pip \
+      liblzo2-dev zlib1g-dev liblzma-dev wget; \
+    ( pip3 install --no-cache-dir --break-system-packages jefferson ubi_reader || true ); \
+    ( cd /tmp && git clone --depth 1 https://github.com/devttys0/sasquatch.git \
+        && cd sasquatch && ./build.sh \
+        && cp -n sasquatch /usr/local/bin/sasquatch || true ); \
+    rm -rf /var/lib/apt/lists/* /tmp/sasquatch
 
 WORKDIR /app
 

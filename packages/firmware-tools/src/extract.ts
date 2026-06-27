@@ -17,7 +17,7 @@ import {
   type CommandLogger,
   type CommandResult,
 } from './exec.js';
-import { ensureDir, walkDirs, pathExists } from './fsutil.js';
+import { ensureDir, walkDirs, walkFiles, pathExists } from './fsutil.js';
 
 export interface ExtractionResult {
   command: CommandResult;
@@ -213,6 +213,26 @@ export async function extractFirmware(
     ['-eM', '--run-as=root', '-C', extractRoot, firmwarePath],
     { runtime, cwd: workspaceRoot, logger: options.logger },
   );
+
+  // Surface real extraction failures instead of silently producing an empty
+  // workspace. If binwalk wrote no files at all, the image is likely encrypted
+  // or uses a format whose extractor isn't installed — make that explicit.
+  const extractedFiles = await walkFiles(extractRoot).catch(() => []);
+  if (extractedFiles.length === 0) {
+    const tail = (command.stderr || command.stdout || '')
+      .split('\n')
+      .filter((l) => l.trim().length > 0)
+      .slice(-12)
+      .join('\n')
+      .trim();
+    throw new Error(
+      `binwalk extracted no files (exit code ${command.exitCode}). The firmware may be ` +
+        `encrypted/signed, or it uses a filesystem whose extractor is not installed. ` +
+        `Common fixes: install "sasquatch" (Huawei LZMA SquashFS), "jefferson" (JFFS2), ` +
+        `or "ubi_reader" (UBIFS). See docs/TROUBLESHOOTING.md.` +
+        (tail ? `\n\nbinwalk output (tail):\n${tail}` : ''),
+    );
+  }
 
   const webRootCandidates = await findWebRootCandidates(extractRoot);
   return { command, extractRoot, webRootCandidates, isMock: false };
