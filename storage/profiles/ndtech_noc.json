@@ -1,0 +1,18 @@
+{
+  "id": "cmqvo3ble0002to9os79jb7po",
+  "name": "NDTECH NOC",
+  "companyName": "NDTECH I.T. Services",
+  "productName": "NDTECH NOC Gateway",
+  "supportText": "For support, contact NDTECH technical support.",
+  "website": "https://ndtech.com.ph",
+  "footerText": "Powered by NDTECH I.T. Services",
+  "primaryColor": "#6366f1",
+  "secondaryColor": "#f59e0b",
+  "loginTitle": "NDTECH Fiber Gateway",
+  "dashboardTitle": "NDTECH Fiber Gateway",
+  "logoPath": null,
+  "faviconPath": null,
+  "isDefault": true,
+  "createdAt": "2026-06-27T01:14:28.082Z",
+  "updatedAt": "2026-06-27T01:34:58.136Z"
+}

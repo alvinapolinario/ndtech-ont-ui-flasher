@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": [
+    "packages/shared/src/**/*.ts",
+    "packages/firmware-tools/src/**/*.ts",
+    "packages/branding-engine/src/**/*.ts",
+    "packages/core/src/**/*.ts",
+    "packages/core/prisma/seed.ts",
+    "apps/api/src/**/*.ts",
+    "apps/cli/src/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/dist", "apps/web"]
+}

@@ -1,0 +1,26 @@
+# Dependencies & build output (reinstalled/rebuilt inside the image)
+node_modules
+**/node_modules
+.next
+**/.next
+dist
+**/dist
+*.tsbuildinfo
+
+# Local runtime data — the container uses its own volume, never the host's
+storage
+**/storage
+
+# Local env & secrets (container config comes from compose)
+.env
+*.env
+!.env.example
+!.env.docker.example
+
+# VCS / editor / logs
+.git
+.gitignore
+*.log
+.DS_Store
+.vscode
+.idea

@@ -1,0 +1,19 @@
+{
+  "name": "@ndtech/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ndtech-ont": "src/index.ts"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ndtech/branding-engine": "*",
+    "@ndtech/core": "*",
+    "@ndtech/shared": "*",
+    "dotenv": "^16.4.7"
+  }
+}

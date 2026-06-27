@@ -1,0 +1,15 @@
+{
+  "name": "NDTECH Default",
+  "companyName": "NDTECH I.T. Services",
+  "productName": "NDTECH Fiber Gateway",
+  "supportText": "For support, contact NDTECH technical support.",
+  "website": "https://ndtech.com.ph",
+  "footerText": "Powered by NDTECH I.T. Services",
+  "primaryColor": "#1e66f5",
+  "secondaryColor": "#16a34a",
+  "loginTitle": "NDTECH Fiber Gateway",
+  "dashboardTitle": "NDTECH Fiber Gateway",
+  "logoPath": null,
+  "faviconPath": null,
+  "isDefault": true
+}

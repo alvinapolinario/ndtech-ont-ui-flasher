@@ -1,0 +1,162 @@
+// NDTECH Huawei ONT Web UI Customizer — Prisma schema (SQLite).
+//
+// NOTE: SQLite has no native array/enum types, so list-ish fields (partitions,
+// webRootCandidates, command args) are stored as JSON strings and parsed in the
+// service/mapper layer. Status/kind fields are validated against the unions in
+// @ndtech/shared.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Firmware {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  sizeBytes    Int
+  sha256       String
+  storagePath  String
+  notes        String?
+  isMock       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  analyses    AnalysisResult[]
+  workspaces  Workspace[]
+  exportJobs  ExportJob[]
+  commandLogs CommandLog[]
+}
+
+model AnalysisResult {
+  id            String   @id @default(cuid())
+  firmwareId    String
+  status        String   @default("pending")
+  binwalkOutput String   @default("")
+  fileOutput    String?
+  partitions    String   @default("[]") // JSON: DetectedPartition[]
+  error         String?
+  isMock        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  firmware Firmware @relation(fields: [firmwareId], references: [id], onDelete: Cascade)
+
+  @@index([firmwareId])
+}
+
+model Workspace {
+  id                String   @id @default(cuid())
+  firmwareId        String
+  status            String   @default("created")
+  rootPath          String
+  extractRoot       String?
+  webRootCandidates String   @default("[]") // JSON: string[]
+  error             String?
+  isMock            Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  firmware    Firmware     @relation(fields: [firmwareId], references: [id], onDelete: Cascade)
+  assets      Asset[]
+  patches     Patch[]
+  commandLogs CommandLog[]
+
+  @@index([firmwareId])
+}
+
+model Asset {
+  id                 String   @id @default(cuid())
+  workspaceId        String
+  relativePath       String
+  absolutePath       String
+  kind               String   @default("other")
+  sizeBytes          Int      @default(0)
+  isWebRootCandidate Boolean  @default(false)
+  containsBrandText  Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+}
+
+model BrandingProfile {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  companyName    String
+  productName    String
+  supportText    String   @default("")
+  website        String   @default("")
+  footerText     String
+  primaryColor   String   @default("#1e66f5")
+  secondaryColor String   @default("#16a34a")
+  loginTitle     String
+  dashboardTitle String
+  logoPath       String?
+  faviconPath    String?
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  patches Patch[]
+}
+
+model Patch {
+  id                String   @id @default(cuid())
+  workspaceId       String
+  brandingProfileId String?
+  assetRelativePath String
+  kind              String   @default("text")
+  oldText           String?
+  newText           String?
+  backupPath        String
+  description       String   @default("")
+  createdAt         DateTime @default(now())
+
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  brandingProfile BrandingProfile? @relation(fields: [brandingProfileId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+}
+
+model CommandLog {
+  id          String   @id @default(cuid())
+  firmwareId  String?
+  workspaceId String?
+  command     String
+  args        String   @default("[]") // JSON: string[]
+  cwd         String?
+  exitCode    Int?
+  stdout      String   @default("")
+  stderr      String   @default("")
+  durationMs  Int      @default(0)
+  isMock      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  firmware  Firmware?  @relation(fields: [firmwareId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([firmwareId])
+  @@index([workspaceId])
+}
+
+model ExportJob {
+  id                      String   @id @default(cuid())
+  firmwareId              String
+  kind                    String
+  status                  String   @default("queued")
+  outputPath              String?
+  includeOriginalFirmware Boolean  @default(false)
+  error                   String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  firmware Firmware @relation(fields: [firmwareId], references: [id], onDelete: Cascade)
+
+  @@index([firmwareId])
+}

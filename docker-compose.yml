@@ -1,0 +1,57 @@
+# NDTECH Huawei ONT Web UI Customizer — Docker deployment
+#
+# Usage:
+#   1. cp .env.docker.example .env            # set PUBLIC_API_URL to your server
+#   2. docker compose build
+#   3. docker compose up -d
+#   4. open http://<server>:3000   (API on :4000)
+#
+# Both services share one image (built by the `api` service). The `web` service
+# reuses that image, so NEXT_PUBLIC_API_URL is baked at build time from
+# PUBLIC_API_URL below — it must be the address the BROWSER uses to reach the API.
+
+services:
+  api:
+    build:
+      context: .
+      args:
+        # Browser-facing API URL, baked into the web bundle at build time.
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:4000}
+    image: ndtech-ont:latest
+    command: ["sh", "docker/entrypoint-api.sh"]
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: "4000"
+      DATABASE_URL: file:/app/storage/ndtech.db
+      STORAGE_ROOT: /app/storage
+      MAX_UPLOAD_BYTES: "268435456"
+      # Keep repack disabled by default (safety). Set to "true" only deliberately.
+      ALLOW_REPACK_EXECUTION: "false"
+      # Live tools are present in the image, so never force mock mode here.
+      FORCE_MOCK_MODE: "false"
+    ports:
+      - "4000:4000"
+    volumes:
+      - ndtech-storage:/app/storage
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  web:
+    image: ndtech-ont:latest
+    depends_on:
+      - api
+    command: ["npm", "run", "start", "--workspace", "@ndtech/web"]
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  ndtech-storage:

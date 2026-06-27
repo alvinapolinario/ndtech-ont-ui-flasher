@@ -1,0 +1,36 @@
+{
+  "name": "ndtech-ont-web-ui-customizer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NDTECH Huawei ONT Web UI Customizer - safe, analysis-only branding tool for owned/spare Huawei EchoLife HG8145V5 V2 ONT firmware images.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "prisma:generate": "prisma generate --schema packages/core/prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema packages/core/prisma/schema.prisma",
+    "seed": "tsx packages/core/prisma/seed.ts",
+    "setup": "npm install && npm run prisma:generate && npm run prisma:push && npm run seed",
+    "dev:api": "npm run dev --workspace @ndtech/api",
+    "dev:web": "npm run dev --workspace @ndtech/web",
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "cli": "tsx apps/cli/src/index.ts",
+    "typecheck": "tsc -b --pretty",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "concurrently": "^9.1.0",
+    "prisma": "^6.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

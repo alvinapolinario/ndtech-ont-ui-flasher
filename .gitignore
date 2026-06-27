@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Storage runtime data (NEVER commit firmware or extracted artifacts)
+/storage/uploads/*
+/storage/workspaces/*
+/storage/exports/*
+!/storage/uploads/.gitkeep
+!/storage/workspaces/.gitkeep
+!/storage/exports/.gitkeep
+
+# Profiles: keep sample JSON profiles + .gitkeep, ignore uploaded logo/favicon binaries
+/storage/profiles/*
+!/storage/profiles/.gitkeep
+!/storage/profiles/*.json
+
+# Database lives at the storage root
+/storage/*.db
+/storage/.seeded
+
+# Proprietary firmware - NEVER commit vendor firmware images
+*.bin
+*.img
+*.fw
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
